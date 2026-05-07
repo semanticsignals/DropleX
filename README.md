@@ -15,7 +15,6 @@ Open-source companion code for **DropleX: Liquid sensing on tablet touchscreens*
 |--------|------------------------|
 | `train_liquid_classifier_rf.py` | **Liquid type** in a rectangular plastic cup: `--container plastic_cup --liquids tap,di,ethanol100`. Filename mapping: **`tap`** → `session_plastic_cup_tap_water`, **`di`** → `session_plastic_cup_deionized`, **`ethanol100`** → `session_plastic_cup_ethanol`. Use `--container heart` for **`session_container_heart_*`** data. |
 | `train_coke_spiking_classifier.py` | Coke / adulterated-soda multiclass (panel‑c style ethanol levels). |
-| `train_conc_alcohol_classifier.py` | Dilution‑level alcohol concentration (distinct from Coke spike multiclass setup). |
 | `train_wine_classifier.py` | Wine adulteration / ethanol‑in‑wine scenarios. |
 | `train_milk_adulteration_classifier.py` | Milk adulteration. |
 | `train_nacl_classifier.py` | **Salinity** (panel d‑style NaCl tiers). |
