@@ -3,7 +3,7 @@
 # Early exit for help flags to avoid loading heavy imports
 import sys
 if '--help' in sys.argv or '-h' in sys.argv:
-    print("""usage: measure2.py [-h] [--f F]
+    print("""usage: tablet_session_visualizer.py [-h] [--f F]
 
 Process session folder with multiple delta CSV files (one per frame).
 
@@ -13,13 +13,13 @@ optional arguments:
               If not specified, folders in data2/ are shown for selection
 
 Example:
-          python3 measure2.py --f data2/session_test
+          python3 tablet_session_visualizer.py --f data2/session_test
           
           """)
     sys.exit(0)
 
 """
-Animate measured = ref + delta from maXTouch CSVs (measure2.py version) with Play/Pause control.
+Animate measured = ref + delta from maXTouch CSVs (multi-frame deltas, one CSV per frame) with Play/Pause control.
 
 This version processes session folders where each frame is stored in a separate CSV file.
 Data structure: data2/session_XXXXX/deltas_0.csv, deltas_TIMESTAMP.csv, etc.

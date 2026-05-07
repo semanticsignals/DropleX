@@ -1,12 +1,15 @@
-# Acquisition & visualization (measure2.py, measure3.py)
+# Acquisition & visualization (tablet_session_visualizer.py)
 numpy>=1.24
 scipy>=1.10
 matplotlib>=3.7
 
-# Training & export (train_coke_spiking_classifier.py)
+# CNN training scripts (Torch)
 torch>=2.0
 scikit-learn>=1.3
 seaborn>=0.12
+
+# Random forest container classifier (train_container_classifier_tree2.py)
+joblib>=1.3
 
 # ONNX export (training) and inference (example_model_inference.py)
 onnx>=1.14
