@@ -1,0 +1,29 @@
+{
+  "model_type": "SpatioTemporalCNN",
+  "input_size": 8,
+  "num_classes": 6,
+  "spiking_names": [
+    "unadulterated",
+    "ethanol10",
+    "ethanol30",
+    "ethanol50",
+    "ethanol80",
+    "ethanol100"
+  ],
+  "sequence_length": 50,
+  "best_accuracy": 0.9995918367346939,
+  "best_fold": 1,
+  "best_epoch": 9,
+  "normalization": {
+    "mean": -29.56352424621582,
+    "std": 101.73512268066406
+  },
+  "input_shape": [
+    8,
+    8
+  ],
+  "output_shape": [
+    6
+  ],
+  "description": "Coke spiking classifier - per-frame CNN model"
+}
