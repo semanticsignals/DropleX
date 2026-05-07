@@ -1,21 +1,17 @@
 #!/usr/bin/env python3
 """
-Train a Random Forest classifier for container liquid classification.
+Train a Random Forest classifier for liquids in plastic cup vs heart-shaped vessel setups.
 
-This script extracts spatial features from sensor data to capture:
-- Ring patterns (positive values around center)
-- Center region characteristics (negative values)
-- Radial distribution patterns
-- Statistical features across different regions
+Plastic-cup filenames in regions/ follow:
+  tap water   → session_plastic_cup_tap_water*_regions.npz
+  deionized   → session_plastic_cup_deionized*_regions.npz
+  pure ethanol→ session_plastic_cup_ethanol*_regions.npz
 
-# Train on plcup data (default)
-python3 train_container_classifier_tree2.py --liquids tap,di,ethanol100
+# Plastic cup — tap, DI, ethanol (figures: liquid-type classification)
+python3 train_liquid_classifier_rf.py --liquids tap,di,ethanol100
 
-# Train on heart data
-python3 train_container_classifier_tree2.py --container heart --liquids tap,di,ethanol100
-
-# Train on heart data with specific settings
-python3 train_container_classifier_tree2.py --container heart --liquids tap,di,ethanol100 --n-estimators 200 --sequence-length 50
+# Heart-shaped vessel (same liquids; different region filename prefix)
+python3 train_liquid_classifier_rf.py --container heart --liquids tap,di,ethanol100 --n-estimators 200 --sequence-length 50
 """
 
 import sys
@@ -37,11 +33,11 @@ import joblib  # For model saving
 
 # Check for help flags early
 if '--help' in sys.argv or '-h' in sys.argv:
-    print("""usage: train_container_classifier_tree.py [-h] [--n-regions N_REGIONS]
+    print("""usage: train_liquid_classifier_rf.py [-h] [--n-regions N_REGIONS]
                                           [--liquids LIQUIDS]
                                           [--container CONTAINER]
 
-Train container liquid classifier with Random Forest
+Train liquid-type classifier (Random Forest)
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -52,7 +48,7 @@ optional arguments:
                         Available: tap, di, wine, coke, ckalc10, ethanol100
                         (default: all liquids)
   --container CONTAINER
-                        Container type to use: 'plcup' or 'heart' (default: plcup)
+                        Vessel geometry: plastic_cup or heart (default: plastic_cup)
   --use-all-combinations
                         Use all C(N,n) combinations (may cause data leakage).
                         Default: False (use non-overlapping random sampling)
@@ -61,6 +57,13 @@ optional arguments:
     sys.exit(0)
 
 REGIONS_DIR = 'regions'
+
+# Regions filename patterns for liquids in rectangular plastic cups (readable names vs legacy codes)
+PLASTIC_CUP_LIQUID_PATTERNS = {
+    'tap': ("session_plastic_cup_tap_water*_regions.npz",),
+    'di': ("session_plastic_cup_deionized*_regions.npz",),
+    'ethanol100': ("session_plastic_cup_ethanol*_regions.npz",),
+}
 
 # All available liquid types
 ALL_LIQUIDS = ['tap', 'di', 'wine', 'coke', 'ckalc10', 'ckalc20', 'ethanol100', 'ckalc40', 'ckalc60', 'ckalc80', 'nacl_0-01', 'nacl_0-001', 'nacl_0-1','nacl_0-0001']
@@ -119,14 +122,15 @@ def extract_spatial_features(frame):
     return np.array(features)
 
 def load_container_liquid_data(patches_dir="regions", sequence_length=50, n_regions=1, 
-                               use_all_combinations=False, selected_liquids=None, container_type='plcup'):
+                               use_all_combinations=False, selected_liquids=None, container_type='plastic_cup'):
     """
-    Load container liquid patch data and create samples by batching regions.
+    Load liquid patch data and create samples by batching regions.
     
     Parameters:
     -----------
     container_type : str
-        Type of container: 'plcup' or 'heart' (default: 'plcup')
+        plastic_cup  — region files prefixed session_plastic_cup_...
+        heart        — region files prefixed session_container_heart_...
     
     Returns:
     --------
@@ -148,17 +152,17 @@ def load_container_liquid_data(patches_dir="regions", sequence_length=50, n_regi
     
     for liquid in liquids_to_load:
         # Search for region files matching the liquid type and container
-        if container_type == 'plcup':
-            if liquid == 'tap':
-                pattern = "session_container_plcup_12*_regions.npz"
-            else:
-                pattern = f"session_container_plcup_{liquid}*_regions.npz"
+        if container_type == 'plastic_cup':
+            patterns = PLASTIC_CUP_LIQUID_PATTERNS.get(liquid, (f"session_plastic_cup_{liquid}*_regions.npz",))
+            files = []
+            for pat in patterns:
+                files.extend(patches_dir.glob(pat))
+            files = list(dict.fromkeys(files))
         elif container_type == 'heart':
             pattern = f"session_container_heart_{liquid}*_regions.npz"
+            files = list(patches_dir.glob(pattern))
         else:
-            raise ValueError(f"Unknown container type: {container_type}. Use 'plcup' or 'heart'.")
-        
-        files = list(patches_dir.glob(pattern))
+            raise ValueError(f"Unknown container type: {container_type}. Use 'plastic_cup' or 'heart'.")
         
         if not files:
             print(f"Warning: No region files found for liquid '{liquid}' with container '{container_type}'")
@@ -684,8 +688,8 @@ def main():
                        help='Number of regions to group and average (default: 1)')
     parser.add_argument('--liquids', type=str, default=None,
                        help='Comma-separated list of liquid types (default: all)')
-    parser.add_argument('--container', type=str, default='plcup', choices=['plcup', 'heart'],
-                       help='Container type: plcup or heart (default: plcup)')
+    parser.add_argument('--container', type=str, default='plastic_cup', choices=['plastic_cup', 'heart'],
+                       help='Vessel type: plastic_cup (rectangular cup) or heart (default: plastic_cup)')
     parser.add_argument('--use-all-combinations', action='store_true',
                        help='Use all C(N,n) combinations (may cause data leakage)')
     parser.add_argument('--n-estimators', type=int, default=200,
@@ -779,7 +783,7 @@ def main():
         
         combo_mode = "allcombos" if args.use_all_combinations else "nonoverlap"
         seq_len_str = f"_seq{sequence_length}" if sequence_length != 50 else ""
-        container_str = f"_{args.container}" if args.container != 'plcup' else ""
+        container_str = f"_{args.container}" if args.container != 'plastic_cup' else ""
         run_name = f"rf_n{args.n_regions}_{combo_mode}_trees{args.n_estimators}{seq_len_str}{container_str}"
         if binary_mode:
             run_name += "_binary"

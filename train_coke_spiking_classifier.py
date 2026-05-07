@@ -57,7 +57,7 @@ optional arguments:
                         (default: False - standard cross-validation)
   --test-sessions SESSIONS
                         Comma-separated list of session names to hold out for testing
-                        in cross-session mode. (e.g., "session_coke_unadulterated_2,session_coke_ethanol10_1")
+                        in cross-session mode. (e.g., "session_coke_unadulterated,session_coke_ethanol10_1")
   --day-suffix DAY      Day identifier suffix for data (e.g., '0109' for Jan 9 data).
                         If not specified, uses original data (no date suffix).
                         Use this to train/test exclusively on a specific day's data.

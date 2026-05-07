@@ -7,46 +7,51 @@ Open-source companion code for **DropleX: Liquid sensing on tablet touchscreens*
 | Path | Role |
 |------|------|
 | `tablet_session_visualizer.py` | Load **`data/session_*`** maXTouch delta CSVs frame-by-frame, visualize, sketch regions (`region_stats.py`). |
-| `regions/*_regions.npz` | Exported region tensors aligned **by session name** with folders under **`data/`** (training scripts read here). |
+| `regions/*_regions.npz` | Exported region tensors — **stem matches the folder name under `data/`** (training scripts read here). |
 
 ## Training scripts (paper experiments)
 
 | Script | Matches figure / task |
 |--------|------------------------|
-| `train_container_classifier_tree2.py` | **Liquid type** (plastic cup): use `--container plcup --liquids tap,di,ethanol100`. In code, **`tap` maps to** `session_container_plcup_12*_regions.npz` (cup geometry “12 mL”; same vessel class as DI/ethanol recordings). |
-| `train_coke_spiking_classifier.py` | Coke / adulterated-soda multiclass (**panel c-style** discriminability; includes multiple ethanol spike levels). |
-| `train_wine_classifier.py` | Wine adulteration / ethanol levels. |
+| `train_liquid_classifier_rf.py` | **Liquid type** in a rectangular plastic cup: `--container plastic_cup --liquids tap,di,ethanol100`. Filename mapping: **`tap`** → `session_plastic_cup_tap_water`, **`di`** → `session_plastic_cup_deionized`, **`ethanol100`** → `session_plastic_cup_ethanol`. Use `--container heart` for **`session_container_heart_*`** data. |
+| `train_coke_spiking_classifier.py` | Coke / adulterated-soda multiclass (panel‑c style ethanol levels). |
+| `train_conc_alcohol_classifier.py` | Dilution‑level alcohol concentration (distinct from Coke spike multiclass setup). |
+| `train_wine_classifier.py` | Wine adulteration / ethanol‑in‑wine scenarios. |
 | `train_milk_adulteration_classifier.py` | Milk adulteration. |
-| `train_conc_alcohol_classifier.py` | Alcohol concentration (dilution) from `regions/` (distinct from spike-level coke multiclass design). |
-| `train_nacl_classifier.py` | **Salinity** tiers (**panel d**, NaCl concentrations). |
+| `train_nacl_classifier.py` | **Salinity** (panel d‑style NaCl tiers). |
 
-See each script’s `--help`.
+Run each script with `--help` for arguments.
 
 ## Published example data (`data/` + matching `regions/`)
 
-**Coke + ethanol spike (panels similar to multiclass adulteration):** one CSV session each — unadulterated, **10 / 20 / 30 / 50 / 80** % ethanol in filename (`session_coke_ethanol*`). The **~20 %** variant matches the qualitative **soda vs soda+20 % ethanol** split in the confusion-matrix panel. **`session_coke_ethanol100` raw CSV was not archived in git** on `main`; bundled **`regions/`** only go up through **ethanol80** for this lineage. To reproduce ethanol100, capture that session locally and regenerate `regions/`.
+**Coke + ethanol spike**
 
-**Wine (unadulterated vs ethanol-adult.):**
+- **`session_coke_unadulterated`** — soda alone  
+- **`session_coke_ethanol10`** … **`session_coke_ethanol80`** incl. **`session_coke_ethanol20`** (~panel “+20 % ethanol” wording)  
 
-- Unadulterated: `session_wine_2023`
-- Adulterated (~mid strength filename): `session_wine_2023_ethanol40` (no **`ethanol50`** CSV in archived `main`; `ethanol40` is the closest half-ish setting we ship.)
+**Coverage gap:** **`session_coke_ethanol100`** raw CSV plus matching `regions/` were **not** on our archived `main` branch; regenerate locally if you need that tier.
 
-**Plastic cup liquids (panel b semantics — DI vs ethanol vs “tap”)**
+**Wine**
 
-- **`session_container_plcup_di`** — deionized water  
-- **`session_container_plcup_ethanol100`** — ethanol  
-- **`session_container_plcup_12`** — **tap water** (paired with geometry label `12` in filenames; classifier maps `liquid=tap` → this pattern.)
+- **`session_wine_2023`** — unadulterated wine  
+- **`session_wine_2023_ethanol40`** — adulterated (**no archived `…_ethanol50` session**—`ethanol40` is the bundled mid‑strength surrogate)
 
-**Salinity (panel d):**
+**Plastic cup — DI vs ethanol vs tap water (panel b)**
 
-- `session_conc_0` — deionized baseline  
-- `session_conc_nacl_0-0001`, `session_conc_nacl_0-001`, `session_conc_nacl_0-01`
+- **`session_plastic_cup_tap_water`** — tap  
+- **`session_plastic_cup_deionized`** — deionized water  
+- **`session_plastic_cup_ethanol`** — pure ethanol in the cup  
 
-Each row above has **`regions/<same_session_name>_regions.npz`**.
+**Salinity**
+
+- **`session_conc_0`** — baseline water  
+- **`session_conc_nacl_0-0001`**, **`session_conc_nacl_0-001`**, **`session_conc_nacl_0-01`**
+
+Each **`data/session_*`** row has **`regions/session_*_regions.npz`** with the **same suffix** (`session_*`).
 
 ## Example model / export docs
 
-- `MODEL_EXPORT_README.md`, `example_model_inference.py`, `my_models/` — ONNX / PyTorch export of a **multiclass ethanol-spiking Coke** checkpoint (not the only model in the paper).
+`MODEL_EXPORT_README.md`, `example_model_inference.py`, `my_models/` — ONNX / PyTorch example for multiclass Coke‑ethanol spiking.
 
 ## Setup
 

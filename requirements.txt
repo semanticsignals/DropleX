@@ -10,7 +10,7 @@ seaborn>=0.12
 
 # Salt concentration (train_nacl_classifier.py) — Torch + sklearn stack above
 
-# Random forest container classifier (train_container_classifier_tree2.py)
+# Random Forest liquid classifier (train_liquid_classifier_rf.py)
 joblib>=1.3
 
 # ONNX export (training) and inference (example_model_inference.py)
