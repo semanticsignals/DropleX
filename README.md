@@ -2,44 +2,60 @@
 
 Open-source companion code for **DropleX: Liquid sensing on tablet touchscreens** (IMWUT 2026).
 
-## Contents
+## Layout
 
 | Path | Role |
 |------|------|
-| `tablet_session_visualizer.py` | Interactive tool: load a session folder of maXTouch-style delta CSVs, visualize frames, outline regions (`region_stats.py`). |
-| `train_coke_spiking_classifier.py` | Coke ethanol-spiking (and related) multiclass CNN; CV and optional ONNX / PyTorch export. |
-| `train_conc_alcohol_classifier.py` | Alcohol **concentration** (dilution-level) classification CNN (`regions/` NPZ inputs). |
-| `train_milk_adulteration_classifier.py` | Milk adulteration CNN. |
-| `train_wine_classifier.py` | Wine ethanol / adulteration CNN tasks. |
-| `train_container_classifier_tree2.py` | Container **liquid-type** classifier (RandomForest on spatial features from `regions/`). |
-| `example_model_inference.py` | Example loader for exported `.pth` / `.onnx` + JSON metadata (see MODEL_EXPORT readme). |
-| `MODEL_EXPORT_README.md` | How training exports checkpoints and normalization for deployment. |
-| `my_models/` | Tiny **example** exported coke multiclass checkpoint (not a leaderboard model). |
+| `tablet_session_visualizer.py` | Load **`data/session_*`** maXTouch delta CSVs frame-by-frame, visualize, sketch regions (`region_stats.py`). |
+| `regions/*_regions.npz` | Exported region tensors aligned **by session name** with folders under **`data/`** (training scripts read here). |
 
-## Example recordings (`data2/`)
+## Training scripts (paper experiments)
 
-Subset of captured sessions for trying the visualizer pipeline (each folder is `deltas_*.csv` per frame):
+| Script | Matches figure / task |
+|--------|------------------------|
+| `train_container_classifier_tree2.py` | **Liquid type** (plastic cup): use `--container plcup --liquids tap,di,ethanol100`. In code, **`tap` maps to** `session_container_plcup_12*_regions.npz` (cup geometry “12 mL”; same vessel class as DI/ethanol recordings). |
+| `train_coke_spiking_classifier.py` | Coke / adulterated-soda multiclass (**panel c-style** discriminability; includes multiple ethanol spike levels). |
+| `train_wine_classifier.py` | Wine adulteration / ethanol levels. |
+| `train_milk_adulteration_classifier.py` | Milk adulteration. |
+| `train_conc_alcohol_classifier.py` | Alcohol concentration (dilution) from `regions/` (distinct from spike-level coke multiclass design). |
+| `train_nacl_classifier.py` | **Salinity** tiers (**panel d**, NaCl concentrations). |
 
-| Folder | Experiment type |
-|--------|----------------|
-| `data2/session_coke_unadulterated_2` | Coke baseline |
-| `data2/session_coke_ethanol10` | Coke + 10% ethanol scenario |
-| `data2/session_coke_ethanol50` | Coke + 50% ethanol scenario |
-| `data2/session_container_heart_tap` | Heart-shaped vessel, tap water |
-| `data2/session_wine_2023_ethanol10` | Wine + 10% ethanol scenario |
+See each script’s `--help`.
 
-Try e.g.: `python3 tablet_session_visualizer.py --help` and `--f data2/session_coke_ethanol10`.
+## Published example data (`data/` + matching `regions/`)
+
+**Coke + ethanol spike (panels similar to multiclass adulteration):** one CSV session each — unadulterated, **10 / 20 / 30 / 50 / 80** % ethanol in filename (`session_coke_ethanol*`). The **~20 %** variant matches the qualitative **soda vs soda+20 % ethanol** split in the confusion-matrix panel. **`session_coke_ethanol100` raw CSV was not archived in git** on `main`; bundled **`regions/`** only go up through **ethanol80** for this lineage. To reproduce ethanol100, capture that session locally and regenerate `regions/`.
+
+**Wine (unadulterated vs ethanol-adult.):**
+
+- Unadulterated: `session_wine_2023`
+- Adulterated (~mid strength filename): `session_wine_2023_ethanol40` (no **`ethanol50`** CSV in archived `main`; `ethanol40` is the closest half-ish setting we ship.)
+
+**Plastic cup liquids (panel b semantics — DI vs ethanol vs “tap”)**
+
+- **`session_container_plcup_di`** — deionized water  
+- **`session_container_plcup_ethanol100`** — ethanol  
+- **`session_container_plcup_12`** — **tap water** (paired with geometry label `12` in filenames; classifier maps `liquid=tap` → this pattern.)
+
+**Salinity (panel d):**
+
+- `session_conc_0` — deionized baseline  
+- `session_conc_nacl_0-0001`, `session_conc_nacl_0-001`, `session_conc_nacl_0-01`
+
+Each row above has **`regions/<same_session_name>_regions.npz`**.
+
+## Example model / export docs
+
+- `MODEL_EXPORT_README.md`, `example_model_inference.py`, `my_models/` — ONNX / PyTorch export of a **multiclass ethanol-spiking Coke** checkpoint (not the only model in the paper).
 
 ## Setup
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate   # Windows: .venv\Scripts\activate
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Training expects region NPZ bundles under **`regions/`** produced from your recording workflow — not shipped in full here.
-
 ## Citation
 
-Add the ACM DOI / BibTeX entry when the camera-ready proceedings entry is finalized.
+Add ACM DOI / BibTeX when camera-ready proceedings are available.

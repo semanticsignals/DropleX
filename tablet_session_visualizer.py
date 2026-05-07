@@ -9,11 +9,11 @@ Process session folder with multiple delta CSV files (one per frame).
 
 optional arguments:
   -h, --help  show this help message and exit
-  --f F       Path to the session folder: data2/session_1325501210916
-              If not specified, folders in data2/ are shown for selection
+  --f F       Path to the session folder: data/session_1325501210916
+              If not specified, folders in data/ are shown for selection
 
 Example:
-          python3 tablet_session_visualizer.py --f data2/session_test
+          python3 tablet_session_visualizer.py --f data/session_test
           
           """)
     sys.exit(0)
@@ -22,7 +22,7 @@ Example:
 Animate measured = ref + delta from maXTouch CSVs (multi-frame deltas, one CSV per frame) with Play/Pause control.
 
 This version processes session folders where each frame is stored in a separate CSV file.
-Data structure: data2/session_XXXXX/deltas_0.csv, deltas_TIMESTAMP.csv, etc.
+Data structure: data/session_XXXXX/deltas_0.csv, deltas_TIMESTAMP.csv, etc.
 All delta files are baseline-corrected by subtracting the first delta (deltas_0.csv).
 
 Rules:
@@ -445,7 +445,7 @@ def load_data_file(file_path, _error_shown_cache={}, _data_cache={}):
     # Check if it's actually a directory
     if not session_folder.is_dir():
         print(f"Error: '{file_path}' is not a directory.")
-        print("Please provide a path to a session folder (e.g., data2/session_XXXXX).")
+        print("Please provide a path to a session folder (e.g., data/session_XXXXX).")
         return None
 
     ref_vec = load_single_vector_from_csv(ref_path)
@@ -573,18 +573,17 @@ def main():
         description="Process session folder with multiple delta CSV files (one per frame)."
     )
 
-    parser.add_argument("--f", help="Path to the session folder: data2/session_1325501210916,\
+    parser.add_argument("--f", help="Path to the session folder: data/session_1325501210916,\
         if not specified all session folders are shown in GUI for selection")
     args = parser.parse_args()
 
     import glob
     import os
 
-    # Search for session folders in current directory first, then data2/ subdirectories
+    # Search for session folders under data/ first (published layout), then legacy paths.
     available_folders = []
 
-    # Priority order: current dir, data2/, ../data2/
-    search_paths = ['.', 'data2', '../data2']
+    search_paths = ['.', 'data', '../data', 'data2', '../data2']
 
     for search_path in search_paths:
         if os.path.exists(search_path):
@@ -608,15 +607,15 @@ def main():
         print("="*60)
         print("\nThis script requires session folders with delta CSV files.")
         print("\nExpected folder structure:")
-        print("  - data2/session_XXXXX/")
+        print("  - data/session_XXXXX/")
         print("    - deltas_0.csv")
         print("    - deltas_TIMESTAMP.csv")
         print("    - ...")
         print("  - Reference file: ref.csv (must exist in current directory)")
         print("\nSearched in:")
         print("  - Current directory for session_* folders")
-        print("  - data2/ subdirectory")
-        print("  - ../data2/ parent directory")
+        print("  - data/ subdirectory (preferred)")
+        print("  - data2/ subdirectory (legacy)")
         print("="*60)
         sys.exit(1)
 
