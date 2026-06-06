@@ -16,18 +16,18 @@ Samsung Galaxy Note 10.1 (2014 edition) with Atmel maXTouch MXT1066T2 (52 × 32 
 
 ## Structure
 
-- `**firmware/`** — Android app that streams live capacitance data and renders it as a real-time heatmap. 
-- `**data/`** — Raw per-frame delta CSV files organized by session (`session_<name>/`). Each session has a baseline frame (`deltas_0.csv`) and subsequent measurement frames.
-- `**regions/**` — Extracted sensor-region tensors (`.npz`) used directly by training scripts.
-- `**tablet_session_visualizer.py**` — Desktop tool to play back recorded sessions as an animated heatmap. Click a region to extract and save it to `regions/`.
-- `**train_*.py**` — Training scripts for each experiment:
+- `firmware/` — Android app that streams live capacitance data and renders it as a real-time heatmap. 
+- `data/` — Raw per-frame delta CSV files organized by session (`session_<name>/`). Each session has a baseline frame (`deltas_0.csv`) and subsequent measurement frames.
+- `regions/` — Extracted sensor-region tensors (`.npz`) used directly by training scripts.
+- `tablet_session_visualizer.py` — Desktop tool to play back recorded sessions as an animated heatmap. Click a region to extract and save it to `regions/`.
+- `train_*.py` — Training scripts for each experiment:
   - `train_liquid_classifier_rf.py` — liquid type (tap / DI / ethanol)
   - `train_coke_spiking_classifier.py` — Coke ethanol-spiking level
   - `train_wine_classifier.py` — wine adulteration
   - `train_nacl_classifier.py` — NaCl concentration
-- `**example_model_inference.py**` — Load a bundled model and run a prediction.
-- `**my_models/**` — Pre-trained CNN (Coke/ethanol spiking), available as `.pth`.
-- `**ref_normal.csv**` — Reference capacitance map snapshot at state of rest.
+- `example_model_inference.py` — Load a bundled model and run a prediction.
+- `my_models/` — Pre-trained CNN (Coke/ethanol spiking), available as `.pth`.
+- `ref_normal.csv` — Reference capacitance map snapshot at state of rest.
 
 ---
 
@@ -54,7 +54,7 @@ All training scripts accept `--help` for the full option list.
 
 ## Included Data
 
-Sessions in `data/` cover four experiments: Coke ethanol-spiking (6 levels), wine adulteration (2 sessions), liquid type in plastic/heart cups (tap, DI, ethanol), and NaCl concentration (4 tiers). Matching `.npz` region files are in `regions/`.
+Sessions in `data/` cover four experiments: Coke ethanol-spiking, wine adulteration, liquid type in plastic cups, and NaCl concentration. Matching `.npz` region files are in `regions/`.
 
 ---
 
