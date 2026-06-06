@@ -1,0 +1,44 @@
+Coke Spiking Classification Results
+5-Fold Cross-Validation
+============================================================
+
+Model: CNN (per-frame)
+Classes: 5
+
+Average Best Test Accuracy: 0.8218 ± 0.0874
+Average Final Test Accuracy: 0.7818 ± 0.1002
+Overall Accuracy (all folds): 0.7818
+
+Per-fold Results:
+------------------------------------------------------------
+Fold 1: Best=0.7273, Final=0.6291
+Fold 2: Best=0.7236, Final=0.7073
+Fold 3: Best=0.9073, Final=0.9073
+Fold 4: Best=0.9327, Final=0.8473
+Fold 5: Best=0.8182, Final=0.8182
+
+============================================================
+Classification Report:
+============================================================
+               precision    recall  f1-score   support
+
+unadulterated       0.81      0.73      0.77       550
+    ethanol10       0.75      0.83      0.79       550
+    ethanol30       0.74      0.82      0.78       550
+    ethanol50       0.67      0.69      0.68       550
+    ethanol80       0.97      0.85      0.90       550
+
+     accuracy                           0.78      2750
+    macro avg       0.79      0.78      0.78      2750
+ weighted avg       0.79      0.78      0.78      2750
+
+============================================================
+Confusion Matrix:
+============================================================
+
+Actual \ Predicted: unadulterated  ethanol10  ethanol30  ethanol50  ethanol80
+  unadulterated:        399        151          0          0          0
+      ethanol10:         93        457          0          0          0
+      ethanol30:          0          0        450        100          0
+      ethanol50:          0          0        158        378         14
+      ethanol80:          0          0          0         84        466
